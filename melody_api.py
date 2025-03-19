@@ -35,7 +35,7 @@ class Melody:
         self.backtrack_expand_index = []
 
         # Path
-        self.lilypond_path = str(pathlib.Path("__file__").parent.resolve()) + "/static/local_file/lilypond/bin/lilypond"
+        self.lilypond_path = "/home/adminuser/venv/lib/python3.10/site-packages/lilypond-binaries/bin/lilypond" #str(pathlib.Path("__file__").parent.resolve()) + "/static/local_file/lilypond/bin/lilypond"
 
         # etc.
         self.filename = None

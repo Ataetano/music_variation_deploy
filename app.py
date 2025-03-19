@@ -86,9 +86,6 @@ def main():
     # MIDI file count variable
     file_count = 0
 
-    # Check Where is Lilypond
-    os.system("pip show lilypond")
-
     # Current Path
     current_path = pathlib.Path("__file__").parent.resolve()
 
