@@ -86,6 +86,9 @@ def main():
     # MIDI file count variable
     file_count = 0
 
+    # Check Where is Lilypond
+    os.system("pip show lilypond")
+
     # Current Path
     current_path = pathlib.Path("__file__").parent.resolve()
 
@@ -130,8 +133,6 @@ def main():
             st.session_state['file_exist'] = 1
 
         if 'uploaded_file' in st.session_state and st.session_state['uploaded_file'] is not None:
-            # Check Where is Lilypond
-            print(os.system("which lilypond"))
 
             st.write("Uploaded file:", st.session_state['uploaded_file'].name)
 
