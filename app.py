@@ -131,8 +131,8 @@ def main():
 
         if 'uploaded_file' in st.session_state and st.session_state['uploaded_file'] is not None:
             # Check Where is Lilypond
-            os.system("which lilypond")
-            
+            print(os.system("which lilypond"))
+
             st.write("Uploaded file:", st.session_state['uploaded_file'].name)
 
             save_directory = os.path.join("static", "midi_file")
