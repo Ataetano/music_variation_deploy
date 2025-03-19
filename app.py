@@ -89,9 +89,6 @@ def main():
     # Current Path
     current_path = pathlib.Path("__file__").parent.resolve()
 
-    # Check Where is Lilypond
-    os.system("find . -name lilypond")
-
     # Left Column: Generate Music Button and File Upload
     with left_col:
 
@@ -133,6 +130,9 @@ def main():
             st.session_state['file_exist'] = 1
 
         if 'uploaded_file' in st.session_state and st.session_state['uploaded_file'] is not None:
+            # Check Where is Lilypond
+            os.system("which lilypond")
+            
             st.write("Uploaded file:", st.session_state['uploaded_file'].name)
 
             save_directory = os.path.join("static", "midi_file")
