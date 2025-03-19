@@ -89,6 +89,9 @@ def main():
     # Current Path
     current_path = pathlib.Path("__file__").parent.resolve()
 
+    # Check Where is Lilypond
+    os.system("find . -name lilypond")
+
     # Left Column: Generate Music Button and File Upload
     with left_col:
 
