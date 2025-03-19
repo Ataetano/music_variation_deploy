@@ -201,15 +201,15 @@ def main():
                     with open(st.session_state['midi_new_download_path'], "rb") as file:
                         st.session_state['new_midi_bytes'] = file.read()
 
-                    # pdf_original_path, pdf_new_path = my_melody.export("pdf")
+                    pdf_original_path, pdf_new_path = my_melody.export("pdf")
 
-                    # st.session_state['pdf_original_path'] = pdf_original_path
-                    # with open(st.session_state['pdf_original_path'], "rb") as file:
-                    #     st.session_state['original_pdf_bytes'] = file.read()
+                    st.session_state['pdf_original_path'] = pdf_original_path
+                    with open(st.session_state['pdf_original_path'], "rb") as file:
+                        st.session_state['original_pdf_bytes'] = file.read()
 
-                    # st.session_state['pdf_new_path'] = pdf_new_path
-                    # with open(st.session_state['pdf_new_path'], "rb") as file:
-                    #     st.session_state['new_pdf_bytes'] = file.read()
+                    st.session_state['pdf_new_path'] = pdf_new_path
+                    with open(st.session_state['pdf_new_path'], "rb") as file:
+                        st.session_state['new_pdf_bytes'] = file.read()
 
                     st.session_state['html_component'] = True
 
@@ -233,13 +233,13 @@ def main():
                 height=300)
 
                 original_col1, original_col2, original_col3, original_col4, original_col5 = st.columns([1,1,2,1,1])
-                # with original_col3:
-                #     st.download_button(
-                #         label="Download Original Music Sheet",
-                #         data=st.session_state['original_pdf_bytes'],
-                #         file_name=str(st.session_state['uploaded_file'].name) + "_original.pdf",
-                #         mime="application/pdf"
-                #         )
+                with original_col3:
+                    st.download_button(
+                        label="Download Original Music Sheet",
+                        data=st.session_state['original_pdf_bytes'],
+                        file_name=str(st.session_state['uploaded_file'].name) + "_original.pdf",
+                        mime="application/pdf"
+                        )
 
                 components.html(
                 f"""
@@ -267,13 +267,13 @@ def main():
                         file_name=str(st.session_state['uploaded_file'].name) + "_new.mid",
                         mime="audio/midi"
                     )
-                # with new_col2:
-                #     st.download_button(
-                #         label="Download New Music Sheet",
-                #         data=st.session_state['new_pdf_bytes'],
-                #         file_name=str(st.session_state['uploaded_file'].name) + "_new.pdf",
-                #         mime="application/pdf"
-                #     )
+                with new_col2:
+                    st.download_button(
+                        label="Download New Music Sheet",
+                        data=st.session_state['new_pdf_bytes'],
+                        file_name=str(st.session_state['uploaded_file'].name) + "_new.pdf",
+                        mime="application/pdf"
+                    )
                 st.session_state['complete_download'] = True
                 st.write("Complete!")
                     
