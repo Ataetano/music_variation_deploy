@@ -35,7 +35,7 @@ class Melody:
         self.backtrack_expand_index = []
 
         # Path
-        self.lilypond_path = str(pathlib.Path("__file__").parent.resolve()) + "/lilypond-2.24.4/bin/lilypond.exe"
+        self.lilypond_path = str(pathlib.Path("__file__").parent.resolve()) + "/lilypond-2.24.4/bin/lilypond"
 
         # etc.
         self.filename = None

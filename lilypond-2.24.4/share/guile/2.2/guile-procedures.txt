@@ -1470,6 +1470,20 @@ endianness
      value in each Guile thread.  Neither the list nor the strings
      within it are copied, so should not be modified later.
 
+chown
+
+- Scheme Procedure: chown object owner group
+     Change the ownership and group of the file referred to by OBJECT to
+     the integer values OWNER and GROUP.  OBJECT can be a string
+     containing a file name or, if the platform supports fchown, a port
+     or integer file descriptor which is open on the file.  The return
+     value is unspecified.
+
+     If OBJECT is a symbolic link, either the ownership of the link or
+     the ownership of the referenced file will be changed depending on
+     the operating system (lchown is unsupported at present).  If OWNER
+     or GROUP is specified as `-1', then that ID is not changed.
+
 open-fdes
 
 - Scheme Procedure: open-fdes path flags [mode]
@@ -1644,6 +1658,41 @@ endianness
      Duplicates in the input vectors appear only once in output.  An
      additional `select!' interface is provided.
 
+fcntl
+
+- Scheme Procedure: fcntl object cmd [value]
+     Apply CMD to the specified file descriptor or the underlying file
+     descriptor of the specified port.  VALUE is an optional integer
+     argument.
+
+     Values for CMD are:
+
+     F_DUPFD
+          Duplicate a file descriptor
+
+     F_GETFD
+          Get flags associated with the file descriptor.
+
+     F_SETFD
+          Set flags associated with the file descriptor to VALUE.
+
+     F_GETFL
+          Get flags associated with the open file.
+
+     F_SETFL
+          Set flags associated with the open file to VALUE
+
+     F_GETOWN
+          Get the process ID of a socket's owner, for `SIGIO' signals.
+
+     F_SETOWN
+          Set the process that owns a socket to VALUE, for `SIGIO'
+          signals.
+
+     FD_CLOEXEC
+          The value used to indicate the "close on exec" flag with
+          `F_GETFL' or `F_SETFL'.
+
 fsync
 
 - Scheme Procedure: fsync object
@@ -1651,6 +1700,12 @@ endianness
      to disk.  If OBJECT is a port, its buffer is flushed before the
      underlying file descriptor is fsync'd.  The return value is
      unspecified.
+
+symlink
+
+- Scheme Procedure: symlink oldpath newpath
+     Create a symbolic link named NEWPATH with the value (i.e., pointing
+     to) OLDPATH.  The return value is unspecified.
 
 readlink
 
@@ -5303,6 +5358,66 @@ write_proc get_position_proc set_position_proc close_proc
      Return all signal handlers to the values they had before any call
      to `sigaction' was made.  The return value is unspecified.
 
+alarm
+
+- Scheme Procedure: alarm i
+     Set a timer to raise a `SIGALRM' signal after the specified number
+     of seconds (an integer).  It's advisable to install a signal
+     handler for `SIGALRM' beforehand, since the default action is to
+     terminate the process.
+
+     The return value indicates the time remaining for the previous
+     alarm, if any.  The new value replaces the previous alarm.  If
+     there was no previous alarm, the return value is zero.
+
+setitimer
+
+- Scheme Procedure: setitimer which_timer interval_seconds
+interval_microseconds value_seconds value_microseconds
+     Set the timer specified by WHICH_TIMER according to the given
+     INTERVAL_SECONDS, INTERVAL_MICROSECONDS, VALUE_SECONDS, and
+     VALUE_MICROSECONDS values.
+
+     Return information about the timer's previous setting.  Errors are
+     handled as described in the guile info pages under ``POSIX
+     Interface Conventions''.
+
+     The timers available are: `ITIMER_REAL', `ITIMER_VIRTUAL', and
+     `ITIMER_PROF'.
+
+     The return value will be a list of two cons pairs representing the
+     current state of the given timer.  The first pair is the seconds
+     and microseconds of the timer `it_interval', and the second pair is
+     the seconds and microseconds of the timer `it_value'.  `ITIMER_PROF'
+     or `ITIMER_VIRTUAL' are not supported on some platforms and will
+     always error.  `(provided? 'ITIMER_PROF)' and `(provided?
+     'ITIMER_VIRTUAL)' report whether those timers are supported.
+
+getitimer
+
+- Scheme Procedure: getitimer which_timer
+     Return information about the timer specified by WHICH_TIMER Errors
+     are handled as described in the guile info pages under ``POSIX
+     Interface Conventions''.
+
+     The timers available are: `ITIMER_REAL', `ITIMER_VIRTUAL', and
+     `ITIMER_PROF'.
+
+     The return value will be a list of two cons pairs representing the
+     current state of the given timer.  The first pair is the seconds
+     and microseconds of the timer `it_interval', and the second pair is
+     the seconds and microseconds of the timer `it_value'.  `ITIMER_PROF'
+     or `ITIMER_VIRTUAL' are not supported on some platforms and will
+     always error.  `(provided? 'ITIMER_PROF)' and `(provided?
+     'ITIMER_VIRTUAL)' report whether those timers are supported.
+
+pause
+
+- Scheme Procedure: pause
+     Pause the current process (thread?) until a signal arrives whose
+     action is to either terminate the current process or invoke a
+     handler procedure.  The return value is unspecified.
+
 sleep
 
 - Scheme Procedure: sleep i
@@ -6997,6 +7112,17 @@ write_proc get_position_proc set_position_proc close_proc
      If `setlocale' has been called (see Locales), month and day names
      are from the current locale and in the locale character set.
 
+strptime
+
+- Scheme Procedure: strptime format string
+     Performs the reverse action to `strftime', parsing STRING according
+     to the specification supplied in FORMAT.  The interpretation of
+     month and day names is dependent on the current locale.  The value
+     returned is a pair.  The car has an object with time components in
+     the form returned by `localtime' or `gmtime', but the time zone
+     components are not usefully set.  The cdr reports the number of
+     characters from STRING which were used for the conversion.
+
 %string-dump
 
 - Scheme Procedure: %string-dump str
@@ -8090,6 +8216,71 @@ write_proc get_position_proc set_position_proc close_proc
      port is likely to block if too much data (typically equal to
      `PIPE_BUF') has been written but not yet read from the input port.
 
+getgroups
+
+- Scheme Procedure: getgroups
+     Return a vector of integers representing the current supplementary
+     group IDs.
+
+setgroups
+
+- Scheme Procedure: setgroups group_vec
+     Set the current set of supplementary group IDs to the integers in
+     the given vector GROUP_VEC.  The return value is unspecified.
+
+     Generally only the superuser can set the process group IDs.
+
+getpw
+
+- Scheme Procedure: getpw [user]
+     Look up an entry in the user database.  USER can be an integer, a
+     string, or omitted, giving the behaviour of `getpwuid', `getpwnam'
+     or `getpwent' respectively.
+
+setpw
+
+- Scheme Procedure: setpw [arg]
+     If called with a true argument, initialize or reset the password
+     data stream.  Otherwise, close the stream.  The `setpwent' and
+     `endpwent' procedures are implemented on top of this.
+
+getgr
+
+- Scheme Procedure: getgr [name]
+     Look up an entry in the group database.  NAME can be an integer, a
+     string, or omitted, giving the behaviour of `getgrgid', `getgrnam'
+     or `getgrent' respectively.
+
+setgr
+
+- Scheme Procedure: setgr [arg]
+     If called with a true argument, initialize or reset the group data
+     stream.  Otherwise, close the stream.  The `setgrent' and
+     `endgrent' procedures are implemented on top of this.
+
+getrlimit
+
+- Scheme Procedure: getrlimit resource
+     Get a resource limit for this process.  RESOURCE identifies the
+     resource, either as an integer or as a symbol.  For example,
+     `(getrlimit 'stack)' gets the limits associated with
+     `RLIMIT_STACK'.
+
+     `getrlimit' returns two values, the soft and the hard limit.  If no
+     limit is set for the resource in question, the returned limit will
+     be `#f'.
+
+setrlimit
+
+- Scheme Procedure: setrlimit resource soft hard
+     Set a resource limit for this process.  RESOURCE identifies the
+     resource, either as an integer or as a symbol.  SOFT and HARD
+     should be integers, or `#f' to indicate no limit (i.e.,
+     `RLIM_INFINITY').
+
+     For example, `(setrlimit 'stack 150000 300000)' sets the
+     `RLIMIT_STACK' limit to 150 kilobytes, with a hard limit of 300 kB.
+
 kill
 
 - Scheme Procedure: kill pid sig
@@ -8182,6 +8373,132 @@ write_proc get_position_proc set_position_proc close_proc
      Return the signal number which stopped the process, if any,
      otherwise `#f'.
 
+getppid
+
+- Scheme Procedure: getppid
+     Return an integer representing the process ID of the parent
+     process.
+
+getuid
+
+- Scheme Procedure: getuid
+     Return an integer representing the current real user ID.
+
+getgid
+
+- Scheme Procedure: getgid
+     Return an integer representing the current real group ID.
+
+geteuid
+
+- Scheme Procedure: geteuid
+     Return an integer representing the current effective user ID.  If
+     the system does not support effective IDs, then the real ID is
+     returned.  `(provided? 'EIDs)' reports whether the system supports
+     effective IDs.
+
+getegid
+
+- Scheme Procedure: getegid
+     Return an integer representing the current effective group ID.  If
+     the system does not support effective IDs, then the real ID is
+     returned.  `(provided? 'EIDs)' reports whether the system supports
+     effective IDs.
+
+setuid
+
+- Scheme Procedure: setuid id
+     Sets both the real and effective user IDs to the integer ID,
+     provided the process has appropriate privileges.  The return value
+     is unspecified.
+
+setgid
+
+- Scheme Procedure: setgid id
+     Sets both the real and effective group IDs to the integer ID,
+     provided the process has appropriate privileges.  The return value
+     is unspecified.
+
+seteuid
+
+- Scheme Procedure: seteuid id
+     Sets the effective user ID to the integer ID, provided the process
+     has appropriate privileges.  If effective IDs are not supported,
+     the real ID is set instead -- `(provided? 'EIDs)' reports whether
+     the system supports effective IDs.  The return value is
+     unspecified.
+
+setegid
+
+- Scheme Procedure: setegid id
+     Sets the effective group ID to the integer ID, provided the process
+     has appropriate privileges.  If effective IDs are not supported,
+     the real ID is set instead -- `(provided? 'EIDs)' reports whether
+     the system supports effective IDs.  The return value is
+     unspecified.
+
+getpgrp
+
+- Scheme Procedure: getpgrp
+     Return an integer representing the current process group ID.  This
+     is the POSIX definition, not BSD.
+
+setpgid
+
+- Scheme Procedure: setpgid pid pgid
+     Move the process PID into the process group PGID.  PID or PGID must
+     be integers: they can be zero to indicate the ID of the current
+     process.  Fails on systems that do not support job control.  The
+     return value is unspecified.
+
+setsid
+
+- Scheme Procedure: setsid
+     Creates a new session.  The current process becomes the session
+     leader and is put in a new process group.  The process will be
+     detached from its controlling terminal if it has one.  The return
+     value is an integer representing the new process group ID.
+
+getsid
+
+- Scheme Procedure: getsid pid
+     Returns the session ID of process PID.  (The session ID of a
+     process is the process group ID of its session leader.)
+
+ttyname
+
+- Scheme Procedure: ttyname port
+     Return a string with the name of the serial terminal device
+     underlying PORT.
+
+ctermid
+
+- Scheme Procedure: ctermid
+     Return a string containing the file name of the controlling
+     terminal for the current process.
+
+tcgetpgrp
+
+- Scheme Procedure: tcgetpgrp port
+     Return the process group ID of the foreground process group
+     associated with the terminal open on the file descriptor underlying
+     PORT.
+
+     If there is no foreground process group, the return value is a
+     number greater than 1 that does not match the process group ID of
+     any existing process group.  This can happen if all of the
+     processes in the job that was formerly the foreground job have
+     terminated, and no other job has yet been moved into the
+     foreground.
+
+tcsetpgrp
+
+- Scheme Procedure: tcsetpgrp port pgid
+     Set the foreground process group ID for the terminal used by the
+     file descriptor underlying PORT to the integer PGID.  The calling
+     process must be a member of the same session as PGID and must have
+     the same controlling terminal.  The return value is unspecified.
+
 execl
 
 - Scheme Procedure: execl filename .  args
@@ -8219,6 +8536,16 @@ write_proc get_position_proc set_position_proc close_proc
      This procedure is currently implemented using the `execve' system
      call, but we call it `execle' because of its Scheme calling
      interface.
+
+primitive-fork
+
+- Scheme Procedure: primitive-fork
+     Creates a new "child" process by duplicating the current "parent"
+     process.  In the child the return value is 0.  In the parent the
+     return value is the integer process ID of the child.
+
+     This procedure has been renamed from `fork' to avoid a naming
+     conflict with the scsh fork.
 
 system*
 
@@ -8329,6 +8656,44 @@ write_proc get_position_proc set_position_proc close_proc
      locale (UTF-8, ISO-8859-1, etc.) is used for the current input,
      output, and error ports
 
+mknod
+
+- Scheme Procedure: mknod path type perms dev
+     Creates a new special file, such as a file corresponding to a
+     device.  PATH specifies the name of the file.  TYPE should be one
+     of the following symbols: regular, directory, symlink,
+     block-special, char-special, fifo, or socket.  PERMS (an integer)
+     specifies the file permissions.  DEV (an integer) specifies which
+     device the special file refers to.  Its exact interpretation
+     depends on the kind of special file being created.
+
+     E.g.,
+
+          (mknod "/dev/fd0" 'block-special #o660 (+ (* 2 256) 2))
+
+     The return value is unspecified.
+
+nice
+
+- Scheme Procedure: nice incr
+     Increment the priority of the current process by INCR.  A higher
+     priority value means that the process runs less often.  The return
+     value is unspecified.
+
+sync
+
+- Scheme Procedure: sync
+     Flush the operating system disk buffers.  The return value is
+     unspecified.
+
+chroot
+
+- Scheme Procedure: chroot path
+     Change the root directory to that specified in PATH.  This
+     directory will be used for path names beginning with `/'.  The root
+     directory is inherited by all children of the current process.  Only
+     the superuser may change the root directory.
+
 getlogin
 
 - Scheme Procedure: getlogin
@@ -8378,6 +8743,16 @@ write_proc get_position_proc set_position_proc close_proc
      Install the CPU affinity mask MASK, a bitvector, for the process or
      thread with ID PID.  The return value is unspecified.
 
+getpass
+
+- Scheme Procedure: getpass prompt
+     Display PROMPT to the standard error output and read a password
+     from `/dev/tty'.  If this file is not accessible, it reads from
+     standard input.  The password may be up to 127 characters in
+     length.  Additional characters and the terminating newline
+     character are discarded.  While reading the password, echoing and
+     the generation of signals by special characters is disabled.
+
 flock
 
 - Scheme Procedure: flock file operation
@@ -8404,6 +8779,12 @@ write_proc get_position_proc set_position_proc close_proc
      descriptor or an open file descriptor port.
 
      Note that `flock' does not lock files across NFS.
+
+sethostname
+
+- Scheme Procedure: sethostname name
+     Set the host name of the current processor to NAME.  May only be
+     used by the superuser.  The return value is not specified.
 
 gethostname
 
