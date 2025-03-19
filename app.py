@@ -233,13 +233,13 @@ def main():
                 height=300)
 
                 original_col1, original_col2, original_col3, original_col4, original_col5 = st.columns([1,1,2,1,1])
-                with original_col3:
-                    # st.download_button(
-                    #     label="Download Original Music Sheet",
-                    #     data=st.session_state['original_pdf_bytes'],
-                    #     file_name=str(st.session_state['uploaded_file'].name) + "_original.pdf",
-                    #     mime="application/pdf"
-                    #     )
+                # with original_col3:
+                #     st.download_button(
+                #         label="Download Original Music Sheet",
+                #         data=st.session_state['original_pdf_bytes'],
+                #         file_name=str(st.session_state['uploaded_file'].name) + "_original.pdf",
+                #         mime="application/pdf"
+                #         )
 
                 components.html(
                 f"""
