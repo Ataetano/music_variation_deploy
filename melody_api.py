@@ -352,6 +352,7 @@ class Melody:
         elif format_type == "pdf":
             us = music21.environment.UserSettings()
             us['lilypondPath'] = self.lilypond_path
+            print(us['lilypondPath'])
             
             original_path = filepath + "/" + self.filename + '_original.pdf'
             original.metadata = music21.metadata.Metadata()
